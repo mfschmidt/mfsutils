@@ -6,6 +6,7 @@ import argparse
 import MySQLdb
 import hashlib
 import socket
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename")
@@ -31,22 +32,23 @@ def myhash(pathname):
     return hasher.hexdigest()
 
 
-#db = MySQLdb.connect(host='tendril8.local', port=3306, user='filer', passwd="filerpass", db="filedb")
-db = MySQLdb.connect(host='localhost', port=3306, user='filer', passwd="filerpass", db="filedb")
+db = MySQLdb.connect(host='tendril8.local', port=3306, user='filer', passwd="filerpass", db="filedb")
+#db = MySQLdb.connect(host='localhost', port=3306, user='filer', passwd="filerpass", db="filedb")
 
 ## The file record that matches up with the database table
 class Filerec:
     def __init__(self, pathname):
         if os.path.isfile(pathname):
-            self.path = pathname
+            self.fullpath = pathname
         else:
             return None
-        self.name = os.path.basename()
-        self.size = os.path.getsize()
+        self.path = os.path.dirname(self.fullpath)
+        self.name = os.path.basename(self.fullpath)
+        self.size = os.path.getsize(self.fullpath)
         self.host = socket.gethostname()
-        self.created = os.path.getctime(self.pathname)
-        self.modified = os.path.getmtime(self.pathname)
-        self.sha256 = myhash(self.pathname)
+        self.created = os.path.getctime(self.fullpath)
+        self.modified = os.path.getmtime(self.fullpath)
+        self.sha256 = myhash(self.fullpath)
         self.problems = []
     
     def name_ok(self):
@@ -130,14 +132,14 @@ class Filerec:
 
     ## listDupes
     ## Retrieve a list of duplicate files from DB
-    def listDupes():
+    def listDupes(self):
         c = db.cursor()
         c.execute("""SELECT * FROM files WHERE size={0} AND sha256={1}""".format(self.size, self.sha256))
         return []
 
     ## addFile
     ## if an identical record does not already exist, add this file to the DB
-    def addFile():
+    def addFile(self):
         return self.store()
 
 
