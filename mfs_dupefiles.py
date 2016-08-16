@@ -32,8 +32,8 @@ def myhash(pathname):
     return hasher.hexdigest()
 
 
-db = MySQLdb.connect(host='tendril8.local', port=3306, user='filer', passwd="filerpass", db="filedb")
-#db = MySQLdb.connect(host='localhost', port=3306, user='filer', passwd="filerpass", db="filedb")
+db = MySQLdb.connect(host='tendril8.local', port=3306, user='filer', passwd="filepass", db="filedb")
+#db = MySQLdb.connect(host='localhost', port=3306, user='filer', passwd="filepass", db="filedb")
 
 ## The file record that matches up with the database table
 class Filerec:
